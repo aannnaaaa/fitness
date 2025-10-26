@@ -1,0 +1,43 @@
+{% load custom_filters %}  <!-- Load the custom filter -->
+
+<style>
+    .question-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    .left-label {
+        width: 200px;
+        text-align: right;
+        padding-right: 10px;
+    }
+    .radio-group {
+        display: flex;
+        justify-content: space-between;
+        width: 300px;
+    }
+    .right-label {
+        width: 200px;
+        padding-left: 10px;
+    }
+</style>
+
+<h1>Опрос САН для {{ participant }}</h1>
+<p>Инструкция: Вам предлагается описать свое состояние в настоящий момент, с помощью таблицы, состоящей из 30 полярных признаков. Вы должны в каждой паре выбрать ту характеристику, которая наиболее точно описывает Ваше состояние и отметить цифру, которая соответствует степени (силе) выраженности данной характеристики.</p>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.phase.label }}: {{ form.phase }}<br><br>
+
+    {% for q in questions %}
+        <div class="question-row">
+            <span class="left-label">{{ q.left }}</span>
+            <div class="radio-group">
+                {{ form|get_q_field:q.num }}
+            </div>
+            <span class="right-label">{{ q.right }}</span>
+        </div>
+    {% endfor %}
+
+    <button type="submit">Отправить</button>
+</form>

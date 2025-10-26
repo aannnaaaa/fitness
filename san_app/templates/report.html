@@ -1,0 +1,6 @@
+<h1>Отчёт по опросам</h1>
+{% for img in img_base64_list %}
+    <img src="data:image/png;base64,{{ img }}" alt="График" style="max-width: 100%;"><br><br>
+{% endfor %}
+<h2>Таблица средних значений</h2>
+{{ table_html | safe }}
