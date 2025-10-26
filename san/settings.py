@@ -67,6 +67,11 @@ TEMPLATES = [
     },
 ]
 
+# Настройки аутентификации
+LOGIN_REDIRECT_URL = '/profile/'  # Куда перенаправлять после входа
+LOGOUT_REDIRECT_URL = 'login'  # Куда перенаправлять после выхода
+LOGIN_URL = 'login'  # URL для страницы входа
+
 WSGI_APPLICATION = 'san.wsgi.application'
 
 

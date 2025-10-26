@@ -1,12 +1,23 @@
+# models.py (полный код с изменениями)
+from django.contrib.auth.models import User
 from django.db import models
+from datetime import date  # Добавьте импорт
 
 class Participant(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="participants", null=True, blank=True)
     name = models.CharField(max_length=100, verbose_name="Фамилия, инициалы")
     gender = models.CharField(max_length=1, choices=[('M', 'Мужской'), ('F', 'Женский')], verbose_name="Пол")
     birth_date = models.DateField(verbose_name="Дата рождения")
 
     def __str__(self):
         return f"{self.name} ({self.gender})"
+
+    @property
+    def age(self):
+        today = date.today()
+        return today.year - self.birth_date.year - ((today.month, today.day) < (self.birth_date.month, self.birth_date.day))
+
+# Остальной код модели Response без изменений...
 
 class Response(models.Model):
     participant = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name="responses")

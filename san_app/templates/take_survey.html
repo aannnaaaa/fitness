@@ -1,107 +1,261 @@
-{% load custom_filters %}  <!-- Load the custom filter -->
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Опрос САН</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .instruction {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196F3;
+        }
+        .phase-selector {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 5px;
+        }
+        .question-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .question-number {
+            min-width: 30px;
+            font-weight: bold;
+            color: #666;
+        }
+        .left-label {
+            width: 200px;
+            text-align: right;
+            padding-right: 15px;
+            font-size: 14px;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            min-width: 320px;
+        }
+        .right-label {
+            width: 200px;
+            padding-left: 15px;
+            font-size: 14px;
+        }
+        .survey-button {
+            padding: 8px 12px;
+            border: 2px solid #ccc;
+            background-color: #f9f9f9;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.2s;
+            min-width: 40px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .survey-button:hover {
+            background-color: #e0e0e0;
+            border-color: #999;
+        }
+        .survey-button.selected {
+            background-color: #2196F3;
+            color: white;
+            border-color: #1976D2;
+        }
+        .submit-button {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            margin: 30px auto;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .submit-button:hover {
+            background-color: #45a049;
+        }
+        .result-section {
+            margin-top: 30px;
+            padding: 20px;
+            border: 2px solid #4CAF50;
+            border-radius: 5px;
+            background-color: #f1f8f4;
+        }
+        .result-section h2 {
+            color: #2e7d32;
+            margin-top: 0;
+        }
+        .result-item {
+            padding: 10px;
+            margin: 10px 0;
+            background-color: white;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .result-label {
+            font-weight: bold;
+        }
+        .result-value {
+            font-size: 18px;
+            color: #1976D2;
+            font-weight: bold;
+        }
+        .scale-info {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 3px;
+        }
+        .nav-links {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .nav-links a {
+            margin: 0 10px;
+            color: #2196F3;
+            text-decoration: none;
+        }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>Опрос САН для {{ participant.name }}</h1>
 
-<style>
-    .question-row {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-    }
-    .left-label {
-        width: 200px;
-        text-align: right;
-        padding-right: 10px;
-    }
-    .button-group {
-        display: flex;
-        justify-content: space-between;
-        width: 300px;
-    }
-    .right-label {
-        width: 200px;
-        padding-left: 10px;
-    }
-    .survey-button {
-        padding: 5px 10px;
-        border: 1px solid #ccc;
-        background-color: #f9f9f9;
-        cursor: pointer;
-        border-radius: 5px;
-        transition: background-color 0.2s;
-        min-width: 30px;
-        text-align: center;
-    }
-    .survey-button:hover {
-        background-color: #e0e0e0;
-    }
-    .survey-button.selected {
-        background-color: #007bff;
-        color: white;
-        border-color: #007bff;
-    }
-</style>
+    <div class="instruction">
+        <strong>Инструкция:</strong> Вам предлагается описать своё состояние в настоящий момент с помощью таблицы,
+        состоящей из 30 полярных признаков. Вы должны в каждой паре выбрать ту характеристику, которая наиболее
+        точно описывает Ваше состояние, и отметить цифру, которая соответствует степени (силе) выраженности данной характеристики.
+        <br><br>
+        <strong>Шкала оценки:</strong> 3 2 1 0 1 2 3, где цифры слева от нуля обозначают степень выраженности
+        левого признака, а цифры справа - правого признака.
+    </div>
 
-<h1>Опрос САН для {{ participant }}</h1>
-<p>Инструкция: Вам предлагается описать свое состояние в настоящий момент, с помощью таблицы, состоящей из 30 полярных признаков. Вы должны в каждой паре выбрать ту характеристику, которая наиболее точно описывает Ваше состояние и отметить цифру, которая соответствует степени (силе) выраженности данной характеристики.</p>
+    <form method="post">
+        {% csrf_token %}
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.phase.label }}: {{ form.phase }}<br><br>
-
-    {% for q in questions %}
-        <div class="question-row">
-            <span class="left-label">{{ q.left }}</span>
-            <div class="button-group" data-question="q{{ q.num }}">
-                <button type="button" class="survey-button" data-value="3">3</button>
-                <button type="button" class="survey-button" data-value="2">2</button>
-                <button type="button" class="survey-button" data-value="1">1</button>
-                <button type="button" class="survey-button" data-value="0">0</button>
-                <button type="button" class="survey-button" data-value="-1">1</button>
-                <button type="button" class="survey-button" data-value="-2">2</button>
-                <button type="button" class="survey-button" data-value="-3">3</button>
-                <!-- Hidden input to store the selected value -->
-                <input type="hidden" name="q{{ q.num }}" id="q{{ q.num }}" value="">
-            </div>
-            <span class="right-label">{{ q.right }}</span>
+        <div class="phase-selector">
+            <label for="id_phase"><strong>{{ form.phase.label }}:</strong></label>
+            {{ form.phase }}
         </div>
-    {% endfor %}
 
-    <button type="submit">Отправить</button>
-</form>
+        {% for q in questions %}
+            <div class="question-row">
+                <span class="question-number">{{ q.num }}.</span>
+                <span class="left-label">{{ q.left }}</span>
+                <div class="button-group" data-question="q{{ q.num }}">
+                    <button type="button" class="survey-button" data-value="3">3</button>
+                    <button type="button" class="survey-button" data-value="2">2</button>
+                    <button type="button" class="survey-button" data-value="1">1</button>
+                    <button type="button" class="survey-button" data-value="0">0</button>
+                    <button type="button" class="survey-button" data-value="-1">1</button>
+                    <button type="button" class="survey-button" data-value="-2">2</button>
+                    <button type="button" class="survey-button" data-value="-3">3</button>
+                    <input type="hidden" name="q{{ q.num }}" id="q{{ q.num }}" value="">
+                </div>
+                <span class="right-label">{{ q.right }}</span>
+            </div>
+        {% endfor %}
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Get all button groups
-    const buttonGroups = document.querySelectorAll('.button-group');
+        <button type="submit" class="submit-button">Отправить</button>
+    </form>
 
-    buttonGroups.forEach(group => {
-        const buttons = group.querySelectorAll('.survey-button');
-        const hiddenInput = group.querySelector('input[type="hidden"]');
+    {% if show_result %}
+        <div class="result-section">
+            <h2>Ваши результаты:</h2>
+            <div class="result-item">
+                <span class="result-label">Самочувствие:</span>
+                <span class="result-value">{{ wellbeing|floatformat:2 }}</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Активность:</span>
+                <span class="result-value">{{ activity|floatformat:2 }}</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Настроение:</span>
+                <span class="result-value">{{ mood|floatformat:2 }}</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Общий балл:</span>
+                <span class="result-value">{{ overall|floatformat:2 }}</span>
+            </div>
+            <div class="scale-info">
+                <strong>Интерпретация:</strong> Баллы рассчитаны по шкале от 1 до 7.
+                <ul>
+                    <li>Больше 5,0 - благоприятное состояние</li>
+                    <li>4,0-5,0 - нормальное состояние</li>
+                    <li>Меньше 4,0 - неблагоприятное состояние</li>
+                </ul>
+                Вы можете пройти опрос снова или вернуться позже.
+            </div>
+        </div>
+    {% endif %}
 
-        buttons.forEach(button => {
-            button.addEventListener('click', function() {
-                // Remove selected class from all buttons in this group
-                buttons.forEach(btn => btn.classList.remove('selected'));
-                // Add selected class to clicked button
-                this.classList.add('selected');
-                // Set the hidden input value
-                hiddenInput.value = this.getAttribute('data-value');
+    <div class="nav-links">
+        <a href="{% url 'profile' %}">Вернуться в профиль</a> |
+        <a href="{% url 'logout' %}">Выход</a>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const buttonGroups = document.querySelectorAll('.button-group');
+
+        buttonGroups.forEach(group => {
+            const buttons = group.querySelectorAll('.survey-button');
+            const hiddenInput = group.querySelector('input[type="hidden"]');
+
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    buttons.forEach(btn => btn.classList.remove('selected'));
+                    this.classList.add('selected');
+                    hiddenInput.value = this.getAttribute('data-value');
+                });
             });
         });
-    });
 
-    // Optional: Validate form before submission
-    document.querySelector('form').addEventListener('submit', function(event) {
-        let allAnswered = true;
-        buttonGroups.forEach(group => {
-            const hiddenInput = group.querySelector('input[type="hidden"]');
-            if (!hiddenInput.value) {
-                allAnswered = false;
+        document.querySelector('form').addEventListener('submit', function(event) {
+            let allAnswered = true;
+            buttonGroups.forEach(group => {
+                const hiddenInput = group.querySelector('input[type="hidden"]');
+                if (!hiddenInput.value) {
+                    allAnswered = false;
+                }
+            });
+            if (!allAnswered) {
+                event.preventDefault();
+                alert('Пожалуйста, ответьте на все вопросы.');
             }
         });
-        if (!allAnswered) {
-            event.preventDefault();
-            alert('Пожалуйста, ответьте на все вопросы.');
-        }
     });
-});
-</script>
+    </script>
+</body>
+</html>
