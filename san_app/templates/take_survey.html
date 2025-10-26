@@ -11,7 +11,7 @@
         text-align: right;
         padding-right: 10px;
     }
-    .radio-group {
+    .button-group {
         display: flex;
         justify-content: space-between;
         width: 300px;
@@ -19,6 +19,24 @@
     .right-label {
         width: 200px;
         padding-left: 10px;
+    }
+    .survey-button {
+        padding: 5px 10px;
+        border: 1px solid #ccc;
+        background-color: #f9f9f9;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background-color 0.2s;
+        min-width: 30px;
+        text-align: center;
+    }
+    .survey-button:hover {
+        background-color: #e0e0e0;
+    }
+    .survey-button.selected {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
     }
 </style>
 
@@ -32,8 +50,16 @@
     {% for q in questions %}
         <div class="question-row">
             <span class="left-label">{{ q.left }}</span>
-            <div class="radio-group">
-                {{ form|get_q_field:q.num }}
+            <div class="button-group" data-question="q{{ q.num }}">
+                <button type="button" class="survey-button" data-value="3">3</button>
+                <button type="button" class="survey-button" data-value="2">2</button>
+                <button type="button" class="survey-button" data-value="1">1</button>
+                <button type="button" class="survey-button" data-value="0">0</button>
+                <button type="button" class="survey-button" data-value="-1">1</button>
+                <button type="button" class="survey-button" data-value="-2">2</button>
+                <button type="button" class="survey-button" data-value="-3">3</button>
+                <!-- Hidden input to store the selected value -->
+                <input type="hidden" name="q{{ q.num }}" id="q{{ q.num }}" value="">
             </div>
             <span class="right-label">{{ q.right }}</span>
         </div>
@@ -41,3 +67,41 @@
 
     <button type="submit">Отправить</button>
 </form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get all button groups
+    const buttonGroups = document.querySelectorAll('.button-group');
+
+    buttonGroups.forEach(group => {
+        const buttons = group.querySelectorAll('.survey-button');
+        const hiddenInput = group.querySelector('input[type="hidden"]');
+
+        buttons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove selected class from all buttons in this group
+                buttons.forEach(btn => btn.classList.remove('selected'));
+                // Add selected class to clicked button
+                this.classList.add('selected');
+                // Set the hidden input value
+                hiddenInput.value = this.getAttribute('data-value');
+            });
+        });
+    });
+
+    // Optional: Validate form before submission
+    document.querySelector('form').addEventListener('submit', function(event) {
+        let allAnswered = true;
+        buttonGroups.forEach(group => {
+            const hiddenInput = group.querySelector('input[type="hidden"]');
+            if (!hiddenInput.value) {
+                allAnswered = false;
+            }
+        });
+        if (!allAnswered) {
+            event.preventDefault();
+            alert('Пожалуйста, ответьте на все вопросы.');
+        }
+    });
+});
+</script>
